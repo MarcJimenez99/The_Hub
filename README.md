@@ -1,5 +1,3 @@
-# Project Team Name: the Hub
-## Members: Kinjal Mugatwala, Neha Gupta, Marc Jimenez
 
 ### How to run the program:
 - Locally
@@ -51,9 +49,6 @@
 - "Your Liked Events": Users can visit this page (found under menu navigation bar) to see the events they liked. This features allows a quick access to the pages user liked to filter from the rest of the events.
 
 
-##### Challenges: 
-- With the edit and delete functionality figuring out how to make the content editable and saving the new message was a challenge. The delete functionality has a rare glitch which sometimes leads to viewing the message twice before it deletes completely. 
 
-- Neha's message: An issue I had was with Visual Studios it wouldn’t allow me to see my partners’ code at times and I would have to delete the repo and start again which led to challenges in committing to Github.
 
 
