@@ -1,0 +1,156 @@
+<header>
+    <div class="Nav_Bar">
+        <div class="menu">
+            <button class="dropmenu">Menu
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="Nav_Text">
+                <a href="/">Home Page</a>
+                <a href="/likedEvents">Your Liked Events</a>
+                <a href="/editProfile">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="chat_container">
+    <div id="title_search_bar">
+        <div>
+            <h1 class="interface_text">Welcome to The Hub</h1>
+        </div>
+        <div>
+            <form action="/logout?_method=DELETE" method="POST">
+                <input class="homepage_button" type="submit" value="Log-out">
+            </form>
+        </div> 
+            <div id="room_search_container">
+                <input id="room_search_box" type="text" placeholder="Search for a specific room or discover a new one!"><button onclick="searchRooms()" class="send_button" >Search</button><button class="send_button" onclick="clearSearch()">Clear Search</button>
+            </div>
+    </div>
+    <div id="home_text_container">
+        <p class="interface_text">Create a new Chatroom or join an Existing one: </p>
+        <p class="interface_text">Existing Rooms:</p>
+    </div>
+    <div id="existing_rooms_container">
+        <div id="existing_rooms">
+        </div>
+        <div id="create_room_container">
+            <form action="/create" id="submit_container" method="POST">
+                <br><br><br>
+                <input id="inputName" type="text" name="inputName" placeholder="What do you want to name the event?" maxlength="50">
+                
+                <select name="category" id="category" class="send_button">
+                    <option value="professional">Professional</option>
+                    <option value="workshop">Workshop</option>
+                    <option value="festival">Festival</option>
+                    <option value="seminar">Seminar</option>
+                    <option value="social">Social</option>
+                </select>
+                
+
+                <textarea name="inputDescription" id="inputDescription" cols="30" rows="10" placeholder="Describe your event. What is it all about?" maxlength="192"></textarea>
+                <input class="homepage_button" type="submit" value="Create Room"/>
+                {{{error_room}}}
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var seenRooms = new Array();
+    var createdRooms = new Array();
+    var filterOn = false;
+    var userInputFilter = "";
+    var homeInterval = window.setInterval(grabExistingRooms, 1000);
+    const existingRoomsContainer = document.getElementById("existing_rooms"); 
+    const room_search = document.getElementById("room_search_box");
+    
+    function grabExistingRooms() {
+        fetch("/getAllRooms")
+        .then(res => res.json()) .then(data => {  
+            for (let i = 0; i < data.length; ++i) {
+                currentRoom = data[i];
+                if (!(seenRooms.includes(currentRoom.roomID))) {
+                    seenRooms.push(currentRoom.roomID);
+                    if (!filterOn) {
+                        printRooms(currentRoom);
+                    }
+                    else {
+                        filterRooms(currentRoom);
+                    }
+                    createdRooms.push(currentRoom);
+                }
+            }
+        })
+        .catch(err => { console.log(err) }); 
+    }
+    function printRooms(currentRoom) {
+        var square = document.createElement("DIV");
+        var eventRoomName = document.createElement("P");
+        var eventDescription = document.createElement("P");
+        var eventCategory = document.createElement("P");
+        var eventLikes = document.createElement("P");
+        var a_link = document.createElement("a");
+        var a_text = document.createTextNode(currentRoom.name);
+        a_link.appendChild(a_text);
+        a_link.href = "/" + currentRoom.name;
+        eventRoomName.appendChild(a_link);
+        eventDescription.appendChild(document.createTextNode(currentRoom.description));
+        eventCategory.appendChild(document.createTextNode("CATEGORY: " + currentRoom.category));
+        eventLikes.appendChild(document.createTextNode("Likes: " + currentRoom.upvote));
+        square.classList.add("a_room");
+        eventRoomName.classList.add("interface_text");
+        eventDescription.classList.add("interface_text");
+        eventCategory.classList.add("interface_text");
+        square.appendChild(eventRoomName);
+        square.appendChild(eventCategory);
+        square.appendChild(eventLikes);
+        square.appendChild(eventDescription);
+        existingRoomsContainer.append(square);
+    }
+    function refreshRooms() {
+        clearAll();
+        for (var i = 0; i < createdRooms.length; ++i) {
+            let description = (createdRooms[i].description).toLowerCase();
+            let name = (createdRooms[i].name).toLowerCase();
+            let category = (createdRooms[i].category).toLowerCase();
+            if (filterOn) {
+                if (description.includes(userInputFilter) || name.includes(userInputFilter) || category.includes(userInputFilter)) {
+                    printRooms(createdRooms[i]);
+                }
+            }
+            else {
+                printRooms(createdRooms[i])
+            }
+        }
+    }
+    function filterRooms(currentRoom) {
+        var description = currentRoom.description.toLowerCase();
+        var name = currentRoom.name.toLowerCase();
+        var category = currentRoom.category.toLowerCase();
+        if (description.includes(userInputFilter) || name.includes(userInputFilter) || category.includes(userInputFilter)) {
+            printRooms(currentRoom);
+        }
+    }
+    function clearSearch() {
+        userInputFilter = "";
+        filterOn = false;
+        room_search.value = '';
+        refreshRooms();
+    }
+    function searchRooms() {
+        userInputFilter = room_search.value.toLowerCase();;
+        if (userInputFilter) {
+            filterOn = true;
+            refreshRooms();
+        }
+        else {
+            filterOn = false;
+            refreshRooms();
+        }
+    }
+    function clearAll() {
+        while(existingRoomsContainer.lastChild) {
+            existingRoomsContainer.removeChild(existingRoomsContainer.lastChild);
+        }
+    }
+</script>

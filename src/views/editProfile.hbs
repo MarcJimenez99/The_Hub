@@ -1,0 +1,81 @@
+<header>
+    <div class="Nav_Bar">
+
+        <div class="menu">
+            <button class="dropmenu">Menu
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="Nav_Text">
+                <a href="/">Home Page</a>
+                <a href="/likedEvents">Your Liked Events</a>
+                <a href="/editProfile">Edit Profile</a>
+            </div>
+
+        </div>
+    </div>
+</header>
+<center>
+    <h1 class="interface_text">Edit Profile</h1>
+    <div id="edit_profile_container">
+        <p id="ProfileName"class="interface_text"></p>
+        <form action="/editProfile/user" method="POST">
+            <p class="interface_text" id="ProfileUsername"></p>
+            {{{ error_user }}}
+            <input type="text" id= "ProfileUsernameInput" name="ProfileUsernameInput" placeholder="Change your Username."><input id="username_button" class="edit_profile_buttons" type="submit" value="Edit">
+        </form>
+        <form action="/editProfile/email" method="POST">
+            <p class="interface_text" id="ProfileEmail"></p>
+            {{{ error_email }}}
+            <input type="text" id= "ProfileEmailInput" name="ProfileEmailInput" placeholder="Change your email."><input class="edit_profile_buttons" type="submit" value="Edit">
+        </form>
+        <form action="/editProfile/age" method="POST">
+            <p class="interface_text" id="ProfileAge"></p>
+            {{{ error_age }}}
+            <input type="number" id= "ProfileAgeInput" name="ProfileAgeInput" placeholder="Age" min="13" max="100"><input class="edit_profile_buttons" type="submit" value="Edit">
+        </form>
+        <form action="/editProfile/address" method="POST">
+            <p class="interface_text" id="ProfileAddress"></p>
+            {{{ error_address }}}
+            <input type="text" id= "ProfileAddressInput" name="ProfileAddressInput" placeholder="What is your Address?"><input class="edit_profile_buttons" type="submit" value="Edit">
+        </form>
+        
+    </div>
+</center>
+
+
+<script>
+
+    var person = "";
+
+    fetch('/editProfile/currUser').then(res => res.json()).then(async data => {
+        person = data.username;  
+        email = data.email;
+        if (data.age == undefined) {
+            age = "No age entered. Please enter an age."
+        }
+        else {
+            age = data.age;
+        }
+        if (data.address == undefined) {
+            address = "No address entered. Please enter an age"
+        }
+        else {
+            address = data.address;
+        }
+        console.log("Person = " + person);
+        document.getElementById("ProfileName").innerHTML = "@" + person;
+        document.getElementById("ProfileUsername").innerHTML = person;
+        document.getElementById("ProfileEmail").innerHTML = email;
+        document.getElementById("ProfileAge").innerHTML = age;
+        document.getElementById("ProfileAddress").innerHTML = address;
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });      
+
+    const button = document.getElementById("username_button")
+    button.addEventListener('click', event => {
+        
+    });
+
+</script>

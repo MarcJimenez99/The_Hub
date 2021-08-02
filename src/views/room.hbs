@@ -1,0 +1,357 @@
+<header>
+    <div class="Nav_Bar">
+        <div class="menu">
+            <button class="dropmenu">Menu
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="Nav_Text">
+                <a href="/">Home Page</a>
+                <a href="/likedEvents">Your Liked Events</a>
+                <a href="/editProfile">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</header>
+<div id="room_container">
+    <div class="chatroom_title">
+        <p>{{ roomName }}</p>
+    </div>
+    <div id="room_info_container">
+        <div id="room_info">
+            <p class="interface_text">Room Name: <span id="RoomName">{{ roomName }}</span></p> 
+            <p class="interface_text">RoomID: <span id="RoomID">{{ roomID }}</span></p> 
+            <p class="interface_text">Owner: {{ owner }} </p> 
+            <p class="interface_text">Description: {{ description }} </p>
+            <p id="demo"></p>
+            <p id="demoid"></p>
+            <p class="interface_text"> Likes: <span id="upvote_update"> {{ upvote }} </span> </p>
+            <div id="display_upvoting"></div>
+
+            <div id="message_search_container">
+                <input id="message_search_box" type="text" placeholder="Search for a specific sent message"><button onclick="searchMessages()" class="send_button">Search</button><button class="send_button" onclick="clearSearch()">Clear Search</button>
+            </div>
+
+
+        </div>
+        <div id="room_messages">
+        </div>
+    </div>
+    <div id="message_field_container">
+        <input id="room_message_box" type="text" name="message"><button onclick=sendMessage() class="send_button">Send</button>
+    </div>
+</div>
+<script>
+
+    var person = "";
+    var personID = "";
+
+    var roomInterval = window.setInterval(grabRoomMessages, 1000);
+    var incrInterval = window.setInterval(updateUpvotes, 1000);
+    var seenMessages = new Array(); //IDs of each message
+    var createdMessages = new Array(); //Message itself
+    var filterOn = false;
+    var userInputFilter = "";
+    const message_search = document.getElementById("message_search_box");
+    const roomMessages = document.getElementById("room_messages");
+    const roomUsed = document.getElementById("RoomName").textContent;
+    const roomID = document.getElementById('RoomID').textContent
+
+    fetch('/:roomName/currUser').then(res => res.json()).then(async data => {
+        person = data.username;  
+        personID = data.userID;
+        console.log("Person = " + person);
+        document.getElementById("demo").innerHTML = "Hello " + person + "!";
+        //document.getElementById("demoid").innerHTML = personID;
+        //isUpvote(pID)
+        var check_upvote = isUpvote(personID);
+        var display_uvElem = document.getElementById("display_upvoting");
+        var tempContent;
+        if(check_upvote == false) { //user can only upvote
+            tempContent = '<button class="send_button" id="upvote_button" onclick="increment()">upvote</button>';
+        } else { //user can only downvote
+            tempContent = '<button class="send_button" id="upvote_button" onclick="decrement()">downvote</button>';
+        }
+        display_uvElem.insertAdjacentHTML('afterbegin', tempContent);
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });    
+
+    function updateUpvotes() {
+        $('#upvote_update').load(document.URL +  ' #upvote_update'); 
+    }
+  
+
+    function grabRoomMessages() {
+        fetch(roomUsed + '/messages/updateArrays').then(res => res.json()).then(room => {
+            createdMessages = room.arr_createdMessages;
+        });
+        console.log(roomMessages.childNodes)
+        console.log(roomMessages.childElementCount)
+        return new Promise(function(myResolve, myReject) {
+            const url = roomUsed + '/messages';
+            fetch(url)
+                .then(res => res.json()).then(async data => {
+                    myResolve(data);
+                    if (data.length < roomMessages.childElementCount) {
+                        window.location.reload(true);
+                    }
+                    else {
+                        for (let i = 0; i < data.length; ++i) {
+                            currentMessage = data[i];
+                            currentMessageID = currentMessage.messageID
+                            if (currentMessage.editFlag === true) {
+                                console.log("Detecting edited messages");
+                                var message = currentMessage.message
+                                var messageID = currentMessageID;
+                                var editFlag = false;
+                                const data = { roomID, editFlag, message, messageID, createdMessages};
+                                const options = {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(data)
+                                };
+                                fetch('/:roomName/edit', options);
+                                window.location.reload(true);
+                            }
+                            if (!(seenMessages.includes(currentMessageID))) {
+                                seenMessages.push(currentMessageID);
+                                if (!filterOn) {
+                                    printMessages(currentMessage);
+                                }
+                                else {
+                                    filterMessages(currentMessage);
+                                }  
+                            }
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                    myReject(error);
+                });
+        });
+    }
+
+    function printMessages(currentMessage) {
+        var message_container = document.createElement("DIV");
+        var username_data_body = document.createElement("P");
+        var message_body = document.createElement("P");
+        var edit_button = document.createElement("BUTTON");
+        var delete_button = document.createElement("BUTTON");
+
+        var username_data_text = document.createTextNode(currentMessage.username + " " + currentMessage.dateOfEntry);
+        var message_body_text = document.createTextNode(currentMessage.message);
+        if (currentMessage.username == person) {
+            edit_button.innerHTML = "Edit";
+            edit_button.setAttribute('id', 'edit_button');
+            edit_button.classList.add("message_buttons");
+            edit_button.onclick = function() {
+                message_body.contentEditable = "true";
+                editMessageButton(message_body, currentMessage, message_body_text);
+            }
+            delete_button.innerHTML = "Delete";
+            delete_button.setAttribute('id', 'delete_button');
+            delete_button.classList.add("message_buttons");
+            delete_button.onclick = function() { deleteButton(currentMessage); }
+        }
+
+        username_data_body.appendChild(username_data_text);
+        if (currentMessage.username == person) {
+            username_data_body.appendChild(edit_button);
+            username_data_body.appendChild(delete_button);
+        }
+        message_body.appendChild(message_body_text);
+        message_container.classList.add("sentMessage");
+        message_container.appendChild(username_data_body);
+        message_container.appendChild(message_body);
+        
+        roomMessages.append(message_container);
+    }
+
+    function sendMessage() {
+        var userInput = document.getElementById("room_message_box").value;
+        var today = new Date();
+        if (today.getMinutes() < 10) {
+            var timeSent = today.getHours() + ":0" + today.getMinutes();
+        }
+        else {
+            var timeSent = today.getHours() + ":" + today.getMinutes();
+        }
+        var messageID = Date.now();
+        const data = { person, userInput, roomUsed, timeSent, messageID };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/:roomName/messages', options);
+        document.getElementById("room_message_box").value = '';
+        window.location.reload(true);
+    }
+
+    function refreshMessages() {
+        clearAll();
+        for (let i = 0; i < createdMessages.length; i++) {
+            let content = (createdMessages[i].message).toLowerCase();
+            let user = (createdMessages[i].username).toLowerCase();
+            if (filterOn) {
+                if (content.includes(userInputFilter) || user.includes(userInputFilter)) {
+                    printMessages(createdMessages[i]);
+                }
+            }
+            else {
+                printMessages(createdMessages[i]);
+            }
+        }
+    }   
+    
+    function filterMessages(currentMessage) {
+        var content = currentMessage.description.toLowerCase();
+        var user = currentMessage.name.toLowerCase();
+        if (content.includes(userInputFilter) || user.includes(userInputFilter)) {
+            printMessages(currentMessage);
+        } 
+    }
+
+    function clearSearch()  {
+        userInputFilter = "";
+        filterOn = false;
+        message_search.value = '';
+        refreshMessages();
+    }
+
+    function searchMessages()  {
+        userInputFilter = message_search.value.toLowerCase();;
+        if (userInputFilter) {
+            filterOn = true;
+            refreshMessages();
+        }
+        else {
+            filterOn = false;
+            refreshMessages();
+        }
+    }
+
+    function clearAll() {
+        while(roomMessages.lastChild) {
+            roomMessages.removeChild(roomMessages.lastChild);
+        }
+    }
+
+    function isUpvote(pID) {
+        var temp_upvoteArr = "{{{arr_upvote}}}";
+        var reg_arr = temp_upvoteArr.split(",");
+        for(let i = 0; i < reg_arr.length; i++) {
+            if(reg_arr[i] == pID) {
+                console.log("true: ", reg_arr[i]);
+                return true;
+                break;
+            }
+            console.log("false");
+        }
+        return false;
+    }
+
+    function increment() {
+        var temp_upvoteArr = "{{{arr_upvote}}}";
+        var reg_arr = temp_upvoteArr.split(",");
+        reg_arr.push(personID); //add to arr_upvote
+        var upvote_val = document.getElementById("upvote_update").textContent;
+        var upvote_num = reg_arr.length - 1;
+        const data = { roomUsed, upvote_num, reg_arr };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/:roomName/update', options);
+        window.location.reload(true);
+    }
+
+
+    function decrement() {
+        var temp_upvoteArr = "{{{arr_upvote}}}";
+        var reg_arr = temp_upvoteArr.split(",");
+
+        for(let i = 0; i < reg_arr.length; i++) {
+            if(reg_arr[i] == personID){
+                reg_arr.splice(i,1);
+            }
+        }
+        var upvote_val = document.getElementById("upvote_update").textContent;
+        var upvote_num = reg_arr.length - 1;
+        const data = { roomUsed, upvote_num, reg_arr };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/:roomName/update', options);
+        window.location.reload(true);
+    }
+
+
+
+
+    function deleteButton(currentMessage){
+        var message = currentMessage.message;
+        var messageID = currentMessage.messageID;
+        for(let i = 0; i < seenMessages.length; i++) {
+            if(seenMessages[i] == messageID){
+                seenMessages.splice(i,1);
+            }
+            if(createdMessages[i].messageID == currentMessage.messageID){
+                createdMessages.splice(i,1);
+            }
+        }
+        console.log("Created Message post delete array: ");
+        console.log(createdMessages);
+        const data = { roomID, message, messageID, createdMessages};
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/:roomName/delete', options);
+    }
+
+    function editMessageButton(message_body, currentMessage, message_body_text){
+       var message;// = message_body_text;
+       var messageID = currentMessage.messageID;
+       document.addEventListener("keyup", function(event) {
+       if (event.keyCode === 13) {
+           message = message_body_text.data;
+           message_body.contentEditable = "false";
+           for(let i = 0; i < createdMessages.length; i++) {
+               if(createdMessages[i].messageID == currentMessage.messageID){
+                   createdMessages[i].message = message;
+               }
+           }
+           console.log("Seen Message post edit array: ");
+           console.log(seenMessages);
+           var editFlag = true;
+           const data = { roomID, editFlag, message, messageID, createdMessages};
+           const options = {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(data)
+           };
+           fetch('/:roomName/edit', options);
+       }
+    });
+ }
+
+</script>

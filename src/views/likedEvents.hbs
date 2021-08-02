@@ -1,0 +1,114 @@
+<header>
+    <div class="Nav_Bar">
+
+        <div class="menu">
+            <button class="dropmenu">Menu
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="Nav_Text">
+                <a href="/">Home Page</a>
+                <a href="/likedEvents">Your Liked Events</a>
+                <a href="/editProfile">Edit Profile</a>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+<center>
+    <h1 class="interface_text">Events You Liked:</h1>
+</center>
+
+<p class="interface_text" id="demo_pid"></p> <br> <br>
+<button class="send_button" id="postLiked" onclick="refreshRooms()">Refresh Liked Events</button> <br> <br>
+<div id="existing_rooms"></div>
+
+
+<script>
+    var person = "";
+    var personID = "";
+    var count = 0;
+    const existingRoomsContainer = document.getElementById("existing_rooms");
+    var refreshInterval = window.setInterval(grabRooms, 1000);
+
+    fetch('/likedEvents/currUser').then(res => res.json()).then(async data => {
+        person = data.username;  
+        personID = data.userID;
+        console.log("Person = " + person);
+        document.getElementById("demo_pid").innerHTML = " Hello <em>" + person + "</em>, these are the events you liked:";
+
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });  
+
+
+    function refreshRooms() {
+        existingRoomsContainer.innerHTML = "";
+        count = 0;
+        grabRooms();
+    }
+
+
+    function grabRooms() {
+        count += 1;
+        if(count <= 1) {
+            fetch("/getAllRooms")
+            .then(res => res.json()) .then(data => {  
+                for (let i = 0; i < data.length; ++i) {
+                    currentRoom = data[i];
+                    curr_arr_upvote = data[i].arr_upvote;
+                    var userLiked = isLiked(curr_arr_upvote);
+                    if(userLiked == true) { //user did upvote
+                        //print room
+                        printRooms(currentRoom);
+
+                    }
+                }
+            })
+            .catch(err => { console.log(err) }); 
+        }
+    }
+
+    function isLiked(curr_arr) {
+        for(let i = 0; i < curr_arr.length; i++) {
+            if(curr_arr[i] == personID) {
+                console.log("true: ", curr_arr[i]);
+                return true;
+                break;
+            }
+            console.log("false");
+        }
+
+        return false;
+    }
+
+
+    function printRooms(currentRoom) {
+        var square = document.createElement("DIV");
+        var eventRoomName = document.createElement("P");
+        var eventDescription = document.createElement("P");
+        var eventCategory = document.createElement("P");
+        var eventLikes = document.createElement("P");
+        var a_link = document.createElement("a");
+        var a_text = document.createTextNode(currentRoom.name);
+        a_link.appendChild(a_text);
+        a_link.href = "/" + currentRoom.name;
+        eventRoomName.appendChild(a_link);
+        eventDescription.appendChild(document.createTextNode(currentRoom.description));
+        eventCategory.appendChild(document.createTextNode("CATEGORY: " + currentRoom.category));
+        eventLikes.appendChild(document.createTextNode("Likes: " + currentRoom.upvote));
+        square.classList.add("a_room");
+        eventRoomName.classList.add("interface_text");
+        eventDescription.classList.add("interface_text");
+        eventCategory.classList.add("interface_text");
+        square.appendChild(eventRoomName);
+        square.appendChild(eventCategory);
+        square.appendChild(eventLikes);
+        square.appendChild(eventDescription);
+        existingRoomsContainer.append(square);
+    }
+
+
+
+</script>

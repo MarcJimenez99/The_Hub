@@ -1,0 +1,376 @@
+/* TODO: style each page */
+
+/* GLOBALCSS */
+body {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  margin: 0;
+  background-color: #2c2f33 !important;
+  height: auto;
+  width: auto;
+}
+
+.Nav_Bar {
+  background-color: black;
+  overflow: hidden;
+}
+
+.Nav_Bar a {
+  float: left;
+  color: white;
+  text-align: center;
+  padding: 20px 12px;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.menu {
+  float: left;
+  overflow: hidden;
+}
+
+.menu .dropmenu {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+}
+
+.Nav_Text {
+  display: none;
+  position: absolute;
+  background-color: #b1eaf8;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.Nav_Text a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.menu:hover .Nav_Text {
+  display: block;
+
+}
+
+.menu:hover .dropmenu {
+  background-color: rgb(0, 110, 255);
+} 
+
+.Nav_Bar a:hover {
+  background-color: white;
+  color: black;
+}
+
+.interface_text {
+	font-family: inherit;
+  color: white;
+  word-wrap: break-word;
+}
+
+.error_text {
+	font-family: inherit;
+  color: red;
+  word-wrap: break-word;
+}
+
+.homepage_button {
+  font-family: inherit;
+  color: white;
+  background-color: #7289da;
+  margin: auto;
+  height: 30px;
+  width: 200px;
+  border-radius: 20px;
+}
+
+/* HOME CSS */
+
+#title_search_bar {
+  width: 1500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+#home_text_container {
+  width: 1500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+#existing_rooms_container {
+  width: 1500px;
+  height: 500px;
+  background-color: #2c2f33;
+  margin: auto;
+}
+
+#chat_container {
+  margin: auto;
+  width: 1800px;
+  height: 900px;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #23272a;
+}
+
+#room_search_box {
+  height: 30px;
+	width: 1000px;	
+	color: white;
+	background-color: #2c2f33;
+}
+
+#submit_container {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+}
+
+#join_button {
+  font-family: inherit;
+  color: white;
+  background-color: #7289da;
+  margin: auto;
+  height: 30px;
+  width: 200px;
+  border-radius: 20px;
+}
+
+.text_input {
+  color: white;
+  background-color: #23272a;
+  /* margin: auto; */
+  width: 200px;
+  height: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+#existing_rooms {
+	font-family: inherit;
+  color: white;
+  background-color: #23272a;
+  border-radius: 20px;
+  height: 225px;
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+}
+
+.a_room {
+  border: solid 6px white;
+  flex: 0 0 200px;
+  border-radius: 20px;
+  height: auto;
+  width: 200px;
+  overflow-y: scroll;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 15px;
+  background-color: rgba(0, 0, 0, 0.664);
+  word-wrap: break-word;
+  animation-name: example2;
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
+}
+
+.a_room:hover {
+  animation-name: example;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes example {
+  from {border-color: rgba(132, 90, 230, 0.932);}
+  to {border-color: rgb(233, 233, 110);}
+}
+
+@keyframes example2 {
+  from {border-color: rgba(230, 84, 84, 0.932);}
+  to {border-color: rgb(92, 233, 238);}
+}
+
+
+.a_room a {
+  color: rgb(177, 177, 228);
+  text-align: center;
+  display: block;
+}
+
+.a_room a:hover {
+  color: rgb(103, 226, 206);
+  
+}
+
+.a_room p {
+  color: rgb(212, 202, 158);
+  margin-left: 5%;
+  margin-right: 5%;
+  display: block;
+}
+
+
+#create_room_container {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+#inputName {
+  color: white;
+  font-family: inherit;
+  background-color: #2c2f33;
+  text-align: center;
+  height: 20px;
+  width: 400px;
+  margin: auto;
+}
+
+#inputDescription {
+  color: white;
+  font-family: inherit;
+  background-color: #2c2f33;
+  display: flex;
+  height: 100px;
+  width: 500px;
+}
+
+/* ROOM CSS */
+
+.chatroom_title {
+	color: rgb(140, 138, 243);
+	font-weight: bold;
+	font-size: 40px;
+  height: 100px;
+  width: auto;
+}
+
+#message_search_box {
+  height: 30px;
+	width: 350px;	
+	color: white;
+	background-color: #2c2f33;
+}
+
+#room_container {
+  /* border: solid 1px red; */
+  margin: auto;
+  width: 1500px;
+  height: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: space-between;
+	flex-direction: column;
+  background-color: #23272a;
+}
+
+#room_info_container {
+	/* border: solid 1px deepskyblue; */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-content: space-between;
+	height: 700px;
+	width: 1500px;
+}
+
+#room_info {
+	margin-left: 50px;
+	border: solid 5px #2c2f33;
+  border-radius: 20px;
+  background-color: #2c2f33;
+  color: white;
+	height: 600px;
+	width: 400px;
+}
+
+#room_messages {
+	margin: auto;
+	border: solid 5px #2c2f33;
+  border-radius: 20px;
+  background-color: #2c2f33;
+  color: white;
+	height: 600px;
+	width: 1000px;
+  overflow-y: scroll;
+}
+
+#message_field_container {
+	/* border: solid 1px red; */
+	height: 100px;
+	width: 1500px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: inherit;
+}
+
+#room_message_box {
+	height: 30px;
+	width: 1000px;	
+	color: white;
+	background-color: #2c2f33;
+}
+
+.send_button {
+	font-family: inherit;
+  color: white;
+  background-color: #7289da;
+	height: 30px;
+}
+
+.sentMessage {
+  font-family: inherit;
+  margin-right: 10px;
+  word-wrap: break-word;
+  border-bottom: solid 1px lightgrey;
+}
+
+.message_buttons {
+  font-family: inherit;
+  color: white;
+  background-color: #7289da;
+  border-radius: 20px;
+}
+
+/* LOGIN + REGISTER CSS */
+
+.login_container {
+  /* border: solid 1px deepskyblue; */
+  margin: auto;
+  height: 500px;
+  width: 500px;
+  background-color: #2c2f33;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  border-radius: 25px;
+}
+
+/* EDIT PROFILE CSS */
+.edit_profile_buttons {
+  font-family: inherit;
+  color: white;
+  background-color: #7289da;
+  margin: auto;
+  height: 25px;
+  width: 50px;
+  border-radius: 20px;
+}

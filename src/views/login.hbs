@@ -1,0 +1,14 @@
+<div class="login_container">
+    <h1 class="interface_text">Welcome back!</h1>
+    <form id="login"action="/login" method="POST">
+        <p class="interface_text">Email</p>
+        {{{error_email}}}
+        <input type="text" id="email" name="email">
+        <p class="interface_text">Password</p>
+        {{{error_password}}}
+        <input type="password" id="password" name="password">
+        <br><br>
+        <input class="homepage_button" type="submit" value="Log-in">
+    </form>
+    <p class="interface_text">Don't have an account? <a href="/register"> Register now! </a></p>
+</div>
